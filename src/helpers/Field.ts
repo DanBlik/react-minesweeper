@@ -1,3 +1,5 @@
+import { incrementNeibours } from "./CellsManipulators"
+
 export type Cell = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 export type Field = Cell[][]
 export type Coords = [number, number]
@@ -20,16 +22,23 @@ export const fieldGenerator = (size: number, dencity: number): Field => {
     throw new Error("Dencity must be between 0 and 1")
   }
 
-  const freeFields = size * size
-  const cellsWithBombs = freeFields * dencity
+  let freeCells = size * size
+  let restCellsWithBombs = freeCells * dencity
 
-  const result: Field = emptyFieldGenerator(1)
+  const result: Field = emptyFieldGenerator(size)
 
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      if (cellsWithBombs === 0) {
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (restCellsWithBombs === 0) {
         return result
       }
+
+      if (restCellsWithBombs / freeCells > Math.random()) {
+        result[y][x] = CellState.bomb
+        incrementNeibours([y, x], result)
+        restCellsWithBombs--
+      }
+      freeCells--
     }
   }
 
